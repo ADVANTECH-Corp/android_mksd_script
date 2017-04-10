@@ -128,16 +128,16 @@ function format_android
 if [ "${android}" -ne "1" ]; then
 	echo "formating sdcard"
 	mkfs.ext4 ${node}${part}4 -Ldata &> /dev/null;sync
-        mkfs.ext4 ${node}${part}5 -Lsystem &> /dev/null;sync
-        mkfs.ext4 ${node}${part}6 -Lcache &> /dev/null;sync
-        mkfs.ext4 ${node}${part}7 -Lvender &> /dev/null;sync
+	mkfs.ext4 ${node}${part}5 -Lsystem &> /dev/null;sync
+	mkfs.ext4 ${node}${part}6 -Lcache &> /dev/null;sync
+	mkfs.ext4 ${node}${part}7 -Ldevice &> /dev/null;sync
 	echo "formating sdcard done"
 else
 	echo "formating emmc"
 	${busybox} mke2fs -T ext4 ${node}${part}4 -Ldata &> /dev/null;sync
 	${busybox} mke2fs -T ext4 ${node}${part}5 -Lsystem &> /dev/null;sync
 	${busybox} mke2fs -T ext4 ${node}${part}6 -Lcache &> /dev/null;sync
-	${busybox} mke2fs -T ext4 ${node}${part}7 -Lvender &> /dev/null;sync
+	${busybox} mke2fs -T ext4 ${node}${part}7 -Ldevice &> /dev/null;sync
 	echo "formating emmc done"
 fi
 
@@ -151,7 +151,15 @@ function flash_android
     echo "dd u-boot.bin done"
     dd if=../image/boot.img of=${node}${part}1 &> /dev/null;sync
     echo "dd boot.img done"
-    dd if=../image/system.img of=${node}${part}5 bs=512k &> /dev/null;sync
+
+    # use pc tool for sd, buildin tool for emmc
+    if [ "${android}" -ne "1" ]; then
+        ./../image/simg2img ../image/system.img ../image/system_raw.img
+    else
+        simg2img ../image/system.img ../image/system_raw.img
+    fi
+    
+    dd if=../image/system_raw.img of=${node}${part}5 bs=512k &> /dev/null;sync
     echo "dd system.img done"
     dd if=../image/recovery.img of=${node}${part}2 bs=512k &> /dev/null;sync
     echo "dd recovery.img done"
