@@ -209,7 +209,7 @@ echo +86M >> $tmp
 echo +2260M >> $tmp
 echo n >> $tmp
 echo p >> $tmp
-echo +2346M >> $tmp
+echo +2348M >> $tmp
 echo "" >> $tmp
 echo n >> $tmp
 echo "" >> $tmp
